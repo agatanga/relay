@@ -1,0 +1,32 @@
+{
+    "name": "agatanga/relay",
+    "description": "A better way to create complex batch job queues in Laravel.",
+    "keywords": ["Queue", "Queue Manager", "Laravel"],
+    "homepage": "https://github.com/agatanga/relay",
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/agatanga/relay/issues",
+        "source": "https://github.com/agatanga/relay"
+    },
+    "authors": [
+        {
+            "name": "Vova Yatsyuk",
+            "email": "vova.yatsyuk@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.3|^8.0",
+        "illuminate/bus": "^8.0",
+        "illuminate/support": "^7.14|^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Agatanga\\Relay\\": "src"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
