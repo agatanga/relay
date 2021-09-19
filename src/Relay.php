@@ -10,18 +10,9 @@ class Relay
 
     private $batches = [];
 
-    private $options = [];
-
     public function name($name)
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function option($key, $value)
-    {
-        $this->options[$key] = $value;
 
         return $this;
     }
@@ -52,8 +43,6 @@ class Relay
                 'current' => $i + 1,
                 'total' => $total,
             ]));
-
-            $batch->options($this->options);
 
             if ($i + 1 < $total) {
                 $next = $this->batches[$i + 1];
