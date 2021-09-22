@@ -19,7 +19,7 @@ class Relay
 
     public function chain($jobs)
     {
-        return $this->add([$jobs]);
+        return $this->add($jobs, true);
     }
 
     public function batch($jobs)
@@ -27,8 +27,18 @@ class Relay
         return $this->add($jobs);
     }
 
-    private function add($jobs)
+    private function add($jobs, $chain = false)
     {
+        $jobs = array_filter($jobs);
+
+        if (!$jobs) {
+            return $this;
+        }
+
+        if ($chain) {
+            $jobs = [$jobs];
+        }
+
         $this->batches[] = new LazyBatch($jobs);
 
         return $this;
