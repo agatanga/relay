@@ -3,6 +3,7 @@
 namespace Agatanga\Relay;
 
 use Illuminate\Support\Facades\Bus;
+use Laravel\SerializableClosure\SerializableClosure;
 
 class LazyBatch
 {
@@ -24,7 +25,7 @@ class LazyBatch
 
     public function then($callback)
     {
-        $this->callback = $callback;
+        $this->callback = serialize(new SerializableClosure($callback));
     }
 
     public function dispatch()
@@ -32,7 +33,7 @@ class LazyBatch
         $batch = Bus::batch($this->jobs)->name($this->name);
 
         if ($this->callback) {
-            $batch->then($this->callback);
+            $batch->then(unserialize($this->callback)->getClosure());
         }
 
         return $batch->dispatch();

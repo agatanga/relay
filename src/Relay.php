@@ -53,14 +53,21 @@ class Relay
                 'current' => $i + 1,
                 'total' => $total,
             ]));
+        }
 
-            if ($i + 1 < $total) {
-                $next = $this->batches[$i + 1];
+        $then = false;
+        $i = $total;
 
-                $batch->then(function (Batch $batch) use ($next) {
-                    $next->dispatch();
-                });
+        while (--$i >= 0) {
+            $current = $this->batches[$i];
+
+            if ($then) {
+                $current->then($then);
             }
+
+            $then = function () use ($current) {
+                $current->dispatch();
+            };
         }
 
         return $this->batches[0]->dispatch();
