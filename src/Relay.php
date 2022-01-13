@@ -20,6 +20,17 @@ class Relay
         return $this->add($jobs);
     }
 
+    public function chain($jobs)
+    {
+        $jobs = array_filter($jobs);
+
+        if (!$jobs) {
+            return $this;
+        }
+
+        return $this->add([$jobs]);
+    }
+
     public function then($jobs)
     {
         return $this->add($jobs);
