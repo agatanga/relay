@@ -5,7 +5,7 @@ namespace Agatanga\Relay;
 use Illuminate\Support\Facades\Bus;
 use Laravel\SerializableClosure\SerializableClosure;
 
-class LazyBatch
+class Batch
 {
     public $jobs;
 

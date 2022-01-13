@@ -38,7 +38,7 @@ class Relay
             return $this;
         }
 
-        $this->batches[] = new LazyBatch($jobs, $method);
+        $this->batches[] = new Batch($jobs, $method);
 
         return $this;
     }
