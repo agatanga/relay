@@ -2,8 +2,6 @@
 
 namespace Agatanga\Relay;
 
-use Illuminate\Bus\Batch;
-
 class Relay
 {
     private $name = '';
@@ -17,17 +15,22 @@ class Relay
         return $this;
     }
 
-    public function chain($jobs)
-    {
-        return $this->add($jobs, true);
-    }
-
     public function batch($jobs)
     {
         return $this->add($jobs);
     }
 
-    private function add($jobs, $chain = false)
+    public function then($jobs)
+    {
+        return $this->add($jobs);
+    }
+
+    public function finally($jobs)
+    {
+        return $this->add($jobs, 'finally');
+    }
+
+    private function add($jobs, $method = 'then')
     {
         $jobs = array_filter($jobs);
 
@@ -35,11 +38,7 @@ class Relay
             return $this;
         }
 
-        if ($chain) {
-            $jobs = [$jobs];
-        }
-
-        $this->batches[] = new LazyBatch($jobs);
+        $this->batches[] = new LazyBatch($jobs, $method);
 
         return $this;
     }
@@ -55,17 +54,17 @@ class Relay
             ]));
         }
 
-        $then = false;
+        $callback = false;
         $i = $total;
 
         while (--$i >= 0) {
             $current = $this->batches[$i];
 
-            if ($then) {
-                $current->then($then);
+            if ($callback) {
+                $current->callback($callback);
             }
 
-            $then = function () use ($current) {
+            $callback = function () use ($current) {
                 $current->dispatch();
             };
         }

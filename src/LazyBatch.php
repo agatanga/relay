@@ -13,9 +13,12 @@ class LazyBatch
 
     public $callback;
 
-    public function __construct($jobs)
+    public $method = 'then';
+
+    public function __construct($jobs, $method)
     {
         $this->jobs = $jobs;
+        $this->method = $method;
     }
 
     public function name($name)
@@ -23,7 +26,7 @@ class LazyBatch
         $this->name = $name;
     }
 
-    public function then($callback)
+    public function callback($callback)
     {
         $this->callback = serialize(new SerializableClosure($callback));
     }
@@ -32,8 +35,8 @@ class LazyBatch
     {
         $batch = Bus::batch($this->jobs)->name($this->name);
 
-        if ($this->callback) {
-            $batch->then(unserialize($this->callback)->getClosure());
+        if ($this->callback && in_array($this->method, ['then', 'finally'])) {
+            $batch->{$this->method}(unserialize($this->callback)->getClosure());
         }
 
         return $batch->dispatch();
