@@ -6,11 +6,38 @@ class Relay
 {
     private $name = '';
 
+    private $meta = [];
+
     private $batches = [];
 
     public function name($name)
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function meta($key, $value = null)
+    {
+        if (is_array($key)) {
+            $meta = $key;
+        } else {
+            $meta = [$key => $value];
+        }
+
+        foreach ($meta as $key => $value) {
+            if (strpos($key, '.') === false) {
+                continue;
+            }
+
+            $entity = explode('.', $key)[0];
+
+            if (!isset($this->meta[$entity])) {
+                $this->meta[$entity] = $value;
+            }
+        }
+
+        $this->meta = array_merge($this->meta, $meta);
 
         return $this;
     }
@@ -57,9 +84,16 @@ class Relay
     public function dispatch()
     {
         $total = count($this->batches);
+        $name = $this->name . '|';
+
+        foreach ($this->meta as $key => $value) {
+            $name .= "[{$key}:{$value}]";
+        }
+
+        $name .= '[:current/:total]';
 
         foreach ($this->batches as $i => $batch) {
-            $batch->name(trans($this->name, [
+            $batch->name(trans($name, [
                 'current' => $i + 1,
                 'total' => $total,
             ]));
