@@ -76,10 +76,8 @@ Relay::chain([
         new RemoveSources($project),
     ])
     ->name('Update Project (:current of :total)')
-    ->meta([
-        'project.update' => $project->id,
-        'causer' => auth()->id,
-    ])
+    ->meta('project.update', $project->id)
+    ->meta('causer', auth()->user()->id)
     ->dispatch();
 ```
 
