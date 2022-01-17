@@ -2,7 +2,7 @@
 
 namespace Agatanga\Relay;
 
-class Relay
+class Dispatcher
 {
     private $name = '';
 
@@ -76,7 +76,7 @@ class Relay
             return $this;
         }
 
-        $this->batches[] = new Batch($jobs, $method);
+        $this->batches[] = new LazyBatch($jobs, $method);
 
         return $this;
     }
