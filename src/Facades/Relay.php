@@ -2,8 +2,9 @@
 
 namespace Agatanga\Relay\Facades;
 
-use Agatanga\Relay\JobBatch;
+use Agatanga\Relay\Models\JobBatch;
 use Agatanga\Relay\Dispatcher;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Facade;
 
 class Relay extends Facade
@@ -13,8 +14,8 @@ class Relay extends Facade
         return Dispatcher::class;
     }
 
-    public static function where(...$arguments): JobBatch
+    public static function whereMeta(...$arguments): Builder
     {
-        return app(JobBatch::class)->where(...$arguments);
+        return app(JobBatch::class)->whereMeta(...$arguments);
     }
 }
