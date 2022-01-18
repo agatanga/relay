@@ -2,6 +2,7 @@
 
 namespace Agatanga\Relay\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class JobBatch extends Model
@@ -12,8 +13,8 @@ class JobBatch extends Model
         $this->table = config('queue.batching.table') ?? 'job_batches';
     }
 
-    public function whereMeta($key, $value)
+    public function scopeWhereMeta(Builder $query, $key, $value): Builder
     {
-        return $this->where('name', 'like', "%[{$key}:{$value}]%");
+        return $query->where('name', 'like', "%[{$key}:{$value}]%");
     }
 }
