@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class JobBatch extends Model
 {
-    public function __construct()
+    public function __construct(array $attributes = [])
     {
-        parent::__construct();
-        $this->table = config('queue.batching.table') ?? 'job_batches';
+        if (!isset($this->table)) {
+            $this->setTable(config('queue.batching.table') ?? 'job_batches');
+        }
+
+        parent::__construct($attributes);
     }
 
     public function scopeWhereMeta(Builder $query, $key, $value): Builder
