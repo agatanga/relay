@@ -2,8 +2,8 @@
 
 namespace Agatanga\Relay\Facades;
 
-use Agatanga\Relay\Models\JobBatch;
 use Agatanga\Relay\Dispatcher;
+use Agatanga\Relay\Models\JobBatch;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Facade;
 
