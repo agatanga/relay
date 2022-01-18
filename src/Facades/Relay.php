@@ -14,8 +14,20 @@ class Relay extends Facade
         return Dispatcher::class;
     }
 
-    public static function whereMeta(...$arguments): Builder
+    public static function __callStatic($method, $args)
     {
-        return app(JobBatch::class)->whereMeta(...$arguments);
+        $modelMethods = [
+            'where',
+            'whereMeta',
+            'whereName',
+        ];
+
+        if (in_array($method, $modelMethods)) {
+            return app(JobBatch::class)->{$method}(...$args);
+        } elseif ($method === 'model') {
+            return app(JobBatch::class);
+        }
+
+        return parent::__callStatic($method, $args);
     }
 }
