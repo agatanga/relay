@@ -4,7 +4,7 @@ A better way to create and manage complex batch job queues in Laravel:
 
  -  [Cleanup your batch callbacks hell](#cleanup-callbacks-hell)
  -  [Store metadata and use it later to search for specific batches](#metadata)
- -  [Calculate progress range considering previous and upcoming batches (In Progress)](#progress-range)
+ -  [Calculate progress considering previous and upcoming batches](#progress)
 
 ## Installation
 
@@ -92,9 +92,7 @@ Relay::whereMeta('project', $id)->first();
 Relay::whereMeta('causer', $id)->all();
 ```
 
-### Progress range
-
-> In progress
+### Progress
 
 Let's assume that the search query from the section above returned the first
 batch. This means that there are two more upcoming batches that are not started
