@@ -40,6 +40,8 @@ Bus::batch([
 Here is the same code written with Relay:
 
 ```php
+use Agatanga\Relay\Facades\Relay;
+
 Relay::chain([
         new DownloadSources($project),
         new DetectSettings($project),
@@ -61,6 +63,8 @@ Relay::chain([
 Use the `meta` method to store additional information about your batch queue:
 
 ```php
+use Agatanga\Relay\Facades\Relay;
+
 Relay::chain([
         new DownloadSources($project),
         new DetectSettings($project),
@@ -82,6 +86,8 @@ Relay::chain([
 Then search for the batch using this data:
 
 ```php
+use Agatanga\Relay\Facades\Relay;
+
 Relay::whereMeta('project', $id)->first();
 Relay::whereMeta('causer', $id)->all();
 ```
@@ -96,5 +102,7 @@ yet. Relay takes this into account and the progress of the first one will be
 recalculated to fit into the `0-33%` range:
 
 ```php
+use Agatanga\Relay\Facades\Relay;
+
 Relay::whereMeta('project.update', $id)->first()->progress(); // only the final batch can return 100%
 ```
