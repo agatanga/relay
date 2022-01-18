@@ -3,7 +3,7 @@
 A better way to create and manage complex batch job queues in Laravel:
 
  -  [Cleanup your batch callbacks hell](#cleanup-callbacks-hell)
- -  [Store custom metadata and use it later to search for specific batches (In Progress)](#batches-metadata)
+ -  [Store metadata and use it later to search for specific batches](#metadata)
  -  [Calculate progress range considering previous and upcoming batches (In Progress)](#progress-range)
 
 ## Installation
@@ -56,9 +56,7 @@ Relay::chain([
     ->dispatch();
 ```
 
-### Batches metadata
-
-> In Progress
+### Metadata
 
 Use the `meta` method to store additional information about your batch queue:
 
@@ -84,8 +82,8 @@ Relay::chain([
 Then search for the batch using this data:
 
 ```php
-Relay::where('project', $id)->first();
-Relay::where('causer', $id)->all();
+Relay::whereMeta('project', $id)->first();
+Relay::whereMeta('causer', $id)->all();
 ```
 
 ### Progress range
@@ -98,5 +96,5 @@ yet. Relay takes this into account and the progress of the first one will be
 recalculated to fit into the `0-33%` range:
 
 ```php
-Relay::where('project.update', $id)->first()->progress(); // only the final batch can return 100%
+Relay::whereMeta('project.update', $id)->first()->progress(); // only the final batch can return 100%
 ```
