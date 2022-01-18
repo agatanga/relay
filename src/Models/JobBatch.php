@@ -17,4 +17,9 @@ class JobBatch extends Model
     {
         return $query->where('name', 'like', "%[{$key}:{$value}]%");
     }
+
+    public function scopeWhereName(Builder $query, $name): Builder
+    {
+        return $query->where('name', 'like', "{$name}|[%");
+    }
 }
