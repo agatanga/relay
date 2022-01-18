@@ -17,15 +17,20 @@ class Relay extends Facade
     public static function __callStatic($method, $args)
     {
         $modelMethods = [
+            'model',
             'where',
             'whereMeta',
             'whereName',
         ];
 
         if (in_array($method, $modelMethods)) {
-            return app(JobBatch::class)->{$method}(...$args);
-        } elseif ($method === 'model') {
-            return app(JobBatch::class);
+            $model = app(JobBatch::class)->latest('id');
+
+            if ($method === 'model') {
+                return $model;
+            }
+
+            return $model->{$method}(...$args);
         }
 
         return parent::__callStatic($method, $args);
