@@ -18,7 +18,20 @@ class JobBatch extends Model
 
     public function scopeWhereMeta(Builder $query, $key, $value): Builder
     {
-        return $query->where('name', 'like', "%[{$key}:{$value}]%");
+        if (!is_array($value)) {
+            $value = [$value];
+        }
+
+        $conditions = [];
+        foreach ($value as $val) {
+            $conditions[] = $key . ':' . $val;
+        }
+
+        return $query->where(function ($q) use ($conditions) {
+            foreach ($conditions as $condition) {
+                $q->orWhere('name', 'like', '%[' . $condition . ']%');
+            }
+        });
     }
 
     public function scopeWhereName(Builder $query, $name): Builder
