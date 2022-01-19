@@ -90,8 +90,8 @@ Then search for the batch:
 ```php
 use Agatanga\Relay\Facades\Relay;
 
-Relay::whereMeta('project.update', $id)->first();
 Relay::whereMeta('causer', $userId)->all();
+Relay::whereMeta('project.update', $id)->first()->meta('causer');
 ```
 
 ### Progress
