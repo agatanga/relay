@@ -4,9 +4,12 @@ namespace Agatanga\Relay\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 class JobBatch extends Model
 {
+    protected $meta;
+
     public function __construct(array $attributes = [])
     {
         if (!isset($this->table)) {
@@ -14,6 +17,23 @@ class JobBatch extends Model
         }
 
         parent::__construct($attributes);
+    }
+
+    public function meta($key)
+    {
+        if (is_null($this->meta)) {
+            preg_match_all('/\[(.+?):(.+?)\]/', $this->attributes['name'] ?? '', $matches);
+
+            $this->meta = [];
+
+            if ($matches[1]) {
+                foreach ($matches[1] as $i => $key) {
+                    $this->meta[$key] = $matches[2][$i];
+                }
+            }
+        }
+
+        return Arr::get($this->meta, $key);
     }
 
     public function progress()
