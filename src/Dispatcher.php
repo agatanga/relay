@@ -93,9 +93,9 @@ class Dispatcher
         $name .= '[:current/:total]';
 
         foreach ($this->batches as $i => $batch) {
-            $batch->name(trans($name, [
-                'current' => $i + 1,
-                'total' => $total,
+            $batch->name(strtr($name, [
+                ':current' => $i + 1,
+                ':total' => $total,
             ]));
         }
 
