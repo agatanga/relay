@@ -4,16 +4,9 @@ namespace Agatanga\Relay\Facades;
 
 use Agatanga\Relay\Dispatcher;
 use Agatanga\Relay\Models\JobBatch;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Facade;
 
-class Relay extends Facade
+class Relay
 {
-    protected static function getFacadeAccessor(): string
-    {
-        return Dispatcher::class;
-    }
-
     public static function __callStatic($method, $args)
     {
         $modelMethods = [
@@ -33,6 +26,6 @@ class Relay extends Facade
             return $model->{$method}(...$args);
         }
 
-        return parent::__callStatic($method, $args);
+        return app(Dispatcher::class)->{$method}(...$args);
     }
 }
