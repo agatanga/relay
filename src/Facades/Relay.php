@@ -17,13 +17,13 @@ class Relay
         ];
 
         if (in_array($method, $modelMethods)) {
-            $model = app(JobBatch::class)->latest('id');
+            $model = app(JobBatch::class);
 
             if ($method === 'model') {
                 return $model;
             }
 
-            return $model->{$method}(...$args);
+            return $model->latest('id')->{$method}(...$args);
         }
 
         return app(Dispatcher::class)->{$method}(...$args);
