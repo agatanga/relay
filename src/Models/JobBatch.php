@@ -69,13 +69,17 @@ class JobBatch extends Model
         ];
     }
 
-    public function scopeWhereMeta(Builder $query, $key, $value): Builder
+    public function scopeWhereMeta(Builder $query, $key, $value = null): Builder
     {
-        if (!is_array($value)) {
+        $conditions = [];
+
+        if (is_null($value)) {
+            $conditions[] = $key;
+            $value = [];
+        } elseif (!is_iterable($value)) {
             $value = [$value];
         }
 
-        $conditions = [];
         foreach ($value as $val) {
             $conditions[] = $key . ':' . $val;
         }
