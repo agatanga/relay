@@ -1,10 +1,12 @@
 # Relay
 
-A better way to create and manage complex batch job queues in Laravel:
+A better way to create and manage complex batch job queues in Laravel.
 
- -  [Cleanup your batch callbacks hell](#cleanup-callbacks-hell)
+Relay provides the following features:
+
+ -  [Flatten nested batch callbacks](#flatten-nested-callbacks)
  -  [Store metadata and use it later to search for specific batches](#metadata)
- -  [Calculate progress considering previous and upcoming batches](#progress)
+ -  [Get batch progress considering previous and upcoming batches](#progress)
 
 ## Installation
 
@@ -14,7 +16,7 @@ composer require agatanga/relay
 
 ## Usage Examples
 
-### Cleanup callbacks hell
+### Flatten nested callbacks
 
 Let's say you have the following job batches code:
 
@@ -60,7 +62,7 @@ Relay::chain([
 
 ### Metadata
 
-Use the `meta` method to store additional information about your batch queue:
+You can use the `meta` method to store additional information about your batch queue:
 
 ```php
 use Agatanga\Relay\Facades\Relay;
@@ -83,24 +85,23 @@ Relay::chain([
     ->dispatch();
 ```
 
-Then search for the batch using this data:
+Then search for the batch:
 
 ```php
 use Agatanga\Relay\Facades\Relay;
 
-Relay::whereMeta('project', $id)->first();
-Relay::whereMeta('causer', $id)->all();
+Relay::whereMeta('project.update', $id)->first();
+Relay::whereMeta('causer', $userId)->all();
 ```
 
 ### Progress
 
 Let's assume that the search query from the section above returned the first
-batch. This means that there are two more upcoming batches that are not started
-yet. Relay takes this into account and the progress of the first one will be
-recalculated to fit into the `0-33%` range:
+batch (`then` and `finally` callbacks are not yet started). Relay takes this into
+account and will return the progress within `0-33%` range.
 
 ```php
 use Agatanga\Relay\Facades\Relay;
 
-Relay::whereMeta('project.update', $id)->first()->progress(); // only the final batch can return 100%
+Relay::whereMeta('project.update', $id)->first()->progress(); // only the last callback can return 100%
 ```
