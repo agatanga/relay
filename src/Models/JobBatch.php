@@ -41,11 +41,6 @@ class JobBatch extends Model
         return Arr::get($this->meta, $key);
     }
 
-    public function progress()
-    {
-        return $this->progress;
-    }
-
     public function getProgressAttribute()
     {
         $progress = $this->total_jobs > 0 ?
