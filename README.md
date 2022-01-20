@@ -104,7 +104,7 @@ account and will return the progress within `0-33%` range.
 ```php
 use Agatanga\Relay\Facades\Relay;
 
-Relay::whereMeta('project.update', $id)->first()->progress(); // only the last callback can return 100%
+Relay::whereMeta('project.update', $id)->first()->progress; // only the last callback can return 100%
 ```
 
 ### Exception
