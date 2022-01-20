@@ -5,10 +5,15 @@ namespace Agatanga\Relay\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 class JobBatch extends Model
 {
     protected $meta;
+
+    protected $casts = [
+        'failed_job_ids' => 'array',
+    ];
 
     public function __construct(array $attributes = [])
     {
@@ -55,6 +60,28 @@ class JobBatch extends Model
     public function getProcessedJobsAttribute()
     {
         return $this->total_jobs - $this->pending_jobs;
+    }
+
+    public function getFailedAttribute()
+    {
+        return $this->failed_jobs > 0;
+    }
+
+    public function getExceptionAttribute()
+    {
+        $id = last($this->failed_job_ids);
+
+        if (!$id) {
+            return '';
+        }
+
+        $job = DB::table(config('queue.failed.table'))->where('uuid', $id)->first();
+
+        if (!$job) {
+            return '';
+        }
+
+        return $job->exception;
     }
 
     public function getFinishedAttribute()
