@@ -38,8 +38,13 @@ class JobBatch extends Model
 
     public function progress()
     {
+        return $this->progress;
+    }
+
+    public function getProgressAttribute()
+    {
         $progress = $this->total_jobs > 0 ?
-            round(($this->processedJobs() / $this->total_jobs) * 100) :
+            round(($this->processed_jobs / $this->total_jobs) * 100) :
             0;
 
         list($min, $max) = array_values($this->range);
@@ -47,19 +52,19 @@ class JobBatch extends Model
         return round($min + ($progress * ($max - $min) / 100));
     }
 
-    public function processedJobs()
+    public function getProcessedJobsAttribute()
     {
         return $this->total_jobs - $this->pending_jobs;
     }
 
-    public function finished()
+    public function getFinishedAttribute()
     {
         return !is_null($this->finished_at) && $this->range['max'] === 100;
     }
 
-    public function running()
+    public function getRunningAttribute()
     {
-        return !$this->failed_jobs && !$this->finished();
+        return !$this->failed_jobs && !$this->finished;
     }
 
     public function getNameAttribute($value)
