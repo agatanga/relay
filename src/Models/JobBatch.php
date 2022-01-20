@@ -41,6 +41,11 @@ class JobBatch extends Model
         return Arr::get($this->meta, $key);
     }
 
+    public function failedJobs()
+    {
+        return app(FailedJob::class)->whereIn('uuid', $this->failed_job_ids);
+    }
+
     public function getProgressAttribute()
     {
         $progress = $this->total_jobs > 0 ?
@@ -64,19 +69,7 @@ class JobBatch extends Model
 
     public function getExceptionAttribute()
     {
-        $id = last($this->failed_job_ids);
-
-        if (!$id) {
-            return '';
-        }
-
-        $job = DB::table(config('queue.failed.table'))->where('uuid', $id)->first();
-
-        if (!$job) {
-            return '';
-        }
-
-        return $job->exception;
+        return $this->failedJobs()->latest('failed_at')->first()->exception;
     }
 
     public function getFinishedAttribute()
