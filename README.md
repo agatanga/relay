@@ -7,7 +7,7 @@ Relay provides the following features:
  -  [Flatten nested batch callbacks](#flatten-nested-callbacks)
  -  [Store metadata and use it later to search for specific batches](#metadata)
  -  [Get batch progress considering previous and upcoming batches](#progress)
- -  [Get exception message from corresponding failed job](#exception)
+ -  [Get corresponding failed jobs](#failed-jobs)
 
 ## Installation
 
@@ -107,10 +107,18 @@ use Agatanga\Relay\Facades\Relay;
 Relay::whereMeta('project.update', $id)->first()->progress; // only the last callback can return 100%
 ```
 
-### Exception
+### Failed Jobs
+
+When batch job fails, Laravel adds a failed job record to the `failed_jobs` table.
+
+Relay allows you to retrieve these failed jobs:
 
 ```php
 use Agatanga\Relay\Facades\Relay;
+
+Relay::whereMeta('project.update', $id)->first()->failedJobs();
+
+// or get the exception string of the last failed job
 
 $batch = Relay::whereMeta('project.update', $id)->first();
 
