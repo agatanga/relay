@@ -70,7 +70,7 @@ to store metadata. All data is stored inside the `name` column and limited to
 Cleaning up|[project:58][project.update:58][3/3]
 ```
 
-Now, let's use the `meta` method to store additional information:
+Now, let's see how to use `meta` method to store additional information:
 
 ```php
 use Agatanga\Relay\Facades\Relay;
@@ -99,8 +99,8 @@ Then search for the batch and retrieve metadata value or name of the batch:
 use Agatanga\Relay\Facades\Relay;
 
 Relay::whereMeta('causer', $userId)->all();
-Relay::whereMeta('project.update', $id)->first()->meta('causer');
-Relay::whereMeta('project.update', $id)->first()->name; // returns "clean" name
+Relay::whereMeta('project', $id)->first()->meta('causer');
+Relay::whereMeta('project.update', $id)->first()->name; // returns clean name
 ```
 
 ### Progress
