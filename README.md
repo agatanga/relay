@@ -7,6 +7,7 @@ Relay provides the following features:
  -  [Flatten nested batch callbacks](#flatten-nested-callbacks)
  -  [Store metadata and use it later to search for specific batches](#metadata)
  -  [Get batch progress considering previous and upcoming batches](#progress)
+ -  [Get exception message from corresponding failed job](#exception)
 
 ## Installation
 
@@ -104,4 +105,16 @@ account and will return the progress within `0-33%` range.
 use Agatanga\Relay\Facades\Relay;
 
 Relay::whereMeta('project.update', $id)->first()->progress(); // only the last callback can return 100%
+```
+
+### Exception
+
+```php
+use Agatanga\Relay\Facades\Relay;
+
+$batch = Relay::whereMeta('project.update', $id)->first();
+
+if ($batch->failed) {
+    echo $batch->exception;
+}
 ```
