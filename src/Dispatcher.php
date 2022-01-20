@@ -42,41 +42,51 @@ class Dispatcher
         return $this;
     }
 
-    public function batch($jobs)
+    public function batch($name, $jobs = null)
     {
-        return $this->add($jobs);
+        return $this->add($name, $jobs);
     }
 
-    public function chain($jobs)
+    public function chain($name, $jobs = null)
     {
+        if (is_array($name)) {
+            $jobs = $name;
+            $name = null;
+        }
+
         $jobs = array_filter($jobs);
 
         if (!$jobs) {
             return $this;
         }
 
-        return $this->add([$jobs]);
+        return $this->add($name, [$jobs]);
     }
 
-    public function then($jobs)
+    public function then($name, $jobs = null)
     {
-        return $this->add($jobs);
+        return $this->add($name, $jobs);
     }
 
-    public function finally($jobs)
+    public function finally($name, $jobs = null)
     {
-        return $this->add($jobs, 'finally');
+        return $this->add($name, $jobs, 'finally');
     }
 
-    private function add($jobs, $method = 'then')
+    private function add($name, $jobs, $method = 'then')
     {
+        if (is_array($name)) {
+            $jobs = $name;
+            $name = null;
+        }
+
         $jobs = array_filter($jobs);
 
         if (!$jobs) {
             return $this;
         }
 
-        $this->batches[] = new LazyBatch($jobs, $method);
+        $this->batches[] = new LazyBatch($name, $jobs, $method);
 
         return $this;
     }
@@ -84,16 +94,22 @@ class Dispatcher
     public function dispatch()
     {
         $total = count($this->batches);
-        $name = $this->name . '|';
+        $meta = '|';
 
         foreach ($this->meta as $key => $value) {
-            $name .= "[{$key}:{$value}]";
+            $meta .= "[{$key}:{$value}]";
         }
 
-        $name .= '[:current/:total]';
+        $meta .= '[:current/:total]';
 
         foreach ($this->batches as $i => $batch) {
-            $batch->name(strtr($name, [
+            $name = $this->name;
+
+            if ($batch->name) {
+                $name = $batch->name;
+            }
+
+            $batch->name(strtr($name . $meta, [
                 ':current' => $i + 1,
                 ':total' => $total,
             ]));

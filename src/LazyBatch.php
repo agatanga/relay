@@ -15,8 +15,9 @@ class LazyBatch
 
     public $method = 'then';
 
-    public function __construct($jobs, $method)
+    public function __construct($name, $jobs, $method)
     {
+        $this->name = $name;
         $this->jobs = $jobs;
         $this->method = $method;
     }
