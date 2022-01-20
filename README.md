@@ -35,9 +35,9 @@ Bus::batch([
         Bus::batch([
             new IgnoreKnownStrings($project),
             new RemoveSources($project),
-        ])->name('Update Project (3 of 3)')->dispatch();
-    })->name('Update Project (2 of 3)')->dispatch();
-})->name('Update Project (1 of 3)')->dispatch();
+        ])->name('Cleaning up')->dispatch();
+    })->name('Updating project data')->dispatch();
+})->name('Downloading')->dispatch();
 ```
 
 Here is the same code written with Relay:
@@ -45,25 +45,32 @@ Here is the same code written with Relay:
 ```php
 use Agatanga\Relay\Facades\Relay;
 
-Relay::chain([
+Relay::chain('Downloading', [
         new DownloadSources($project),
         new DetectSettings($project),
     ])
-    ->then([
+    ->then('Updating project data', [
         new ReadStringFiles($project),
         new ReadSourceFiles($project),
     ])
-    ->finally([
+    ->finally('Cleaning up', [
         new IgnoreKnownStrings($project),
         new RemoveSources($project),
     ])
-    ->name('Update Project (:current of :total)')
     ->dispatch();
 ```
 
 ### Metadata
 
-You can use the `meta` method to store additional information about your batch queue:
+Before we start, you may want to know that Relay doesn't modify `job_batches` table
+to store metadata. All data is stored inside the `name` column and limited to
+255 chars. Here is how the name of the batch may look like with the metadata:
+
+```
+Cleaning up|[project:58][project.update:58][3/3]
+```
+
+Now, let's use the `meta` method to store additional information:
 
 ```php
 use Agatanga\Relay\Facades\Relay;
@@ -86,13 +93,14 @@ Relay::chain([
     ->dispatch();
 ```
 
-Then search for the batch:
+Then search for the batch and retrieve metadata value or name of the batch:
 
 ```php
 use Agatanga\Relay\Facades\Relay;
 
 Relay::whereMeta('causer', $userId)->all();
 Relay::whereMeta('project.update', $id)->first()->meta('causer');
+Relay::whereMeta('project.update', $id)->first()->name; // returns "clean" name
 ```
 
 ### Progress
