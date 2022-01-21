@@ -77,9 +77,14 @@ class JobBatch extends Model
         return !is_null($this->finished_at) && $this->range['max'] === 100;
     }
 
+    public function getCancelledAttribute(): bool
+    {
+        return !is_null($this->cancelled_at);
+    }
+
     public function getRunningAttribute(): bool
     {
-        return !$this->failed_jobs && !$this->finished;
+        return !$this->failed_jobs && !$this->cancelled && !$this->finished;
     }
 
     public function getNameAttribute($value): string
