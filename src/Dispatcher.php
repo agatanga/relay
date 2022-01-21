@@ -10,14 +10,14 @@ class Dispatcher
 
     private $batches = [];
 
-    public function name($name)
+    public function name($name): static
     {
         $this->name = $name;
 
         return $this;
     }
 
-    public function meta($key, $value = null)
+    public function meta($key, $value = null): static
     {
         if (is_array($key)) {
             $meta = $key;
@@ -42,12 +42,12 @@ class Dispatcher
         return $this;
     }
 
-    public function batch($name, $jobs = null)
+    public function batch($name, $jobs = null): static
     {
         return $this->add($name, $jobs);
     }
 
-    public function chain($name, $jobs = null)
+    public function chain($name, $jobs = null): static
     {
         if (is_array($name)) {
             $jobs = $name;
@@ -63,17 +63,17 @@ class Dispatcher
         return $this->add($name, [$jobs]);
     }
 
-    public function then($name, $jobs = null)
+    public function then($name, $jobs = null): static
     {
         return $this->add($name, $jobs);
     }
 
-    public function finally($name, $jobs = null)
+    public function finally($name, $jobs = null): static
     {
         return $this->add($name, $jobs, 'finally');
     }
 
-    private function add($name, $jobs, $method = 'then')
+    private function add($name, $jobs, $method = 'then'): static
     {
         if (is_array($name)) {
             $jobs = $name;
@@ -91,7 +91,7 @@ class Dispatcher
         return $this;
     }
 
-    public function dispatch()
+    public function dispatch(): mixed
     {
         $total = count($this->batches);
         $meta = '|';

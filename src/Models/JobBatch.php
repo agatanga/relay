@@ -24,7 +24,7 @@ class JobBatch extends Model
         parent::__construct($attributes);
     }
 
-    public function meta($key)
+    public function meta($key): mixed
     {
         if (is_null($this->meta)) {
             preg_match_all('/\[(.+?):(.+?)\]/', $this->attributes['name'] ?? '', $matches);
@@ -41,12 +41,12 @@ class JobBatch extends Model
         return Arr::get($this->meta, $key);
     }
 
-    public function failedJobs()
+    public function failedJobs(): Builder
     {
         return app(FailedJob::class)->whereIn('uuid', $this->failed_job_ids);
     }
 
-    public function getProgressAttribute()
+    public function getProgressAttribute(): int
     {
         $progress = $this->total_jobs > 0 ?
             round(($this->processed_jobs / $this->total_jobs) * 100) :
@@ -57,32 +57,32 @@ class JobBatch extends Model
         return round($min + ($progress * ($max - $min) / 100));
     }
 
-    public function getProcessedJobsAttribute()
+    public function getProcessedJobsAttribute(): int
     {
         return $this->total_jobs - $this->pending_jobs;
     }
 
-    public function getFailedAttribute()
+    public function getFailedAttribute(): bool
     {
         return $this->failed_jobs > 0;
     }
 
-    public function getExceptionAttribute()
+    public function getExceptionAttribute(): string
     {
         return $this->failedJobs()->latest('failed_at')->first()?->exception;
     }
 
-    public function getFinishedAttribute()
+    public function getFinishedAttribute(): bool
     {
         return !is_null($this->finished_at) && $this->range['max'] === 100;
     }
 
-    public function getRunningAttribute()
+    public function getRunningAttribute(): bool
     {
         return !$this->failed_jobs && !$this->finished;
     }
 
-    public function getNameAttribute($value)
+    public function getNameAttribute($value): string
     {
         if ($value) {
             return substr($value, 0, strpos($value, '|['));
@@ -91,7 +91,7 @@ class JobBatch extends Model
         return $value;
     }
 
-    public function getRangeAttribute()
+    public function getRangeAttribute(): array
     {
         preg_match('/\[(\d+)\/(\d+)\]$/', $this->attributes['name'] ?? '', $matches);
 

@@ -22,14 +22,18 @@ class LazyBatch
         $this->method = $method;
     }
 
-    public function name($name)
+    public function name($name): static
     {
         $this->name = $name;
+
+        return $this;
     }
 
-    public function callback($callback)
+    public function callback($callback): static
     {
         $this->callback = serialize(new SerializableClosure($callback));
+
+        return $this;
     }
 
     public function dispatch()
