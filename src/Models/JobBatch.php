@@ -69,7 +69,7 @@ class JobBatch extends Model
 
     public function getExceptionAttribute()
     {
-        return $this->failedJobs()->latest('failed_at')->first()->exception;
+        return $this->failedJobs()->latest('failed_at')->first()?->exception;
     }
 
     public function getFinishedAttribute()
