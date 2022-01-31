@@ -116,6 +116,28 @@ class JobBatch extends Model
 
     public function scopeWhereMeta(Builder $query, $key, $value = null): Builder
     {
+        $conditions = $this->buildMetaConditions($key, $value);
+
+        return $query->where(function ($q) use ($conditions) {
+            foreach ($conditions as $condition) {
+                $q->orWhere('name', 'like', '%[' . $condition . ']%');
+            }
+        });
+    }
+
+    public function scopeOrWhereMeta(Builder $query, $key, $value = null): Builder
+    {
+        $conditions = $this->buildMetaConditions($key, $value);
+
+        return $query->orWhere(function ($q) use ($conditions) {
+            foreach ($conditions as $condition) {
+                $q->orWhere('name', 'like', '%[' . $condition . ']%');
+            }
+        });
+    }
+
+    protected function buildMetaConditions($key, $value = null): array
+    {
         $conditions = [];
 
         if (is_null($value)) {
@@ -129,15 +151,16 @@ class JobBatch extends Model
             $conditions[] = $key . ':' . $val;
         }
 
-        return $query->where(function ($q) use ($conditions) {
-            foreach ($conditions as $condition) {
-                $q->orWhere('name', 'like', '%[' . $condition . ']%');
-            }
-        });
+        return $conditions;
     }
 
     public function scopeWhereName(Builder $query, $name): Builder
     {
         return $query->where('name', 'like', "{$name}|[%");
+    }
+
+    public function scopeOrWhereName(Builder $query, $name): Builder
+    {
+        return $query->orWhere('name', 'like', "{$name}|[%");
     }
 }
