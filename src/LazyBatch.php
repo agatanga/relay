@@ -2,6 +2,7 @@
 
 namespace Agatanga\Relay;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Bus\Batchable;
 use Laravel\SerializableClosure\SerializableClosure;
@@ -48,6 +49,42 @@ class LazyBatch
         }
 
         return $batch->dispatch();
+    }
+
+    public function through($middleware)
+    {
+        $middleware = array_filter(Arr::wrap($middleware));
+
+        if (!$middleware) {
+            return $this;
+        }
+
+        foreach ($this->jobs as $jobs) {
+            $jobs = Arr::wrap($jobs);
+
+            foreach ($jobs as $job) {
+                if ($job->middleware) {
+                    continue;
+                }
+
+                $job->through($middleware);
+            }
+        }
+
+        return $this;
+    }
+
+    public function __call($method, $parameters)
+    {
+        foreach ($this->jobs as $jobs) {
+            $jobs = Arr::wrap($jobs);
+
+            foreach ($jobs as $job) {
+                $job->{$method}(...$parameters);
+            }
+        }
+
+        return $this;
     }
 
     private function validateJobs(array $jobs)

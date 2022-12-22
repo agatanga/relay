@@ -42,14 +42,15 @@ class Dispatcher
         return $this;
     }
 
-    public function batch($name, $jobs = null): static
+    public function batch($name, $jobs = null, $middleware = null): static
     {
-        return $this->add($name, $jobs);
+        return $this->add($name, $jobs, $middleware);
     }
 
-    public function chain($name, $jobs = null): static
+    public function chain($name, $jobs = null, $middleware = null): static
     {
         if (is_array($name)) {
+            $middleware = $jobs;
             $jobs = $name;
             $name = null;
         }
@@ -60,22 +61,23 @@ class Dispatcher
             return $this;
         }
 
-        return $this->add($name, [$jobs]);
+        return $this->add($name, [$jobs], $middleware);
     }
 
-    public function then($name, $jobs = null): static
+    public function then($name, $jobs = null, $middleware = null): static
     {
-        return $this->add($name, $jobs);
+        return $this->add($name, $jobs, $middleware);
     }
 
-    public function finally($name, $jobs = null): static
+    public function finally($name, $jobs = null, $middleware = null): static
     {
-        return $this->add($name, $jobs, 'finally');
+        return $this->add($name, $jobs, $middleware, 'finally');
     }
 
-    private function add($name, $jobs, $method = 'then'): static
+    private function add($name, $jobs, $middleware, $method = 'then'): static
     {
         if (is_array($name)) {
+            $middleware = $jobs;
             $jobs = $name;
             $name = null;
         }
@@ -86,7 +88,7 @@ class Dispatcher
             return $this;
         }
 
-        $this->batches[] = new LazyBatch($name, $jobs, $method);
+        $this->batches[] = (new LazyBatch($name, $jobs, $method))->through($middleware);
 
         return $this;
     }
@@ -131,5 +133,14 @@ class Dispatcher
         }
 
         return $this->batches[0]->dispatch();
+    }
+
+    public function __call($method, $parameters)
+    {
+        foreach ($this->batches as $batch) {
+            $batch->{$method}(...$parameters);
+        }
+
+        return $this;
     }
 }
