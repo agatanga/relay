@@ -1,13 +1,23 @@
 # Relay
 
-A better way to create and manage complex batch job queues in Laravel.
+A better way to create and manage complex batch job queues in Laravel:
 
-Relay provides the following features:
+```php
+Relay::chain([new Job1, new Job2])
+    ->batch([new Job3_1, new Job3_2])
+    ->chain([new Job4, new Job5])
+    ->through([new Middleware])
+    ->dispatch();
+```
 
- -  [Flatten nested batch callbacks](#flatten-nested-callbacks)
- -  [Store metadata and use it later to search for specific batches](#metadata)
- -  [Get batch progress considering previous and upcoming batches](#progress)
- -  [Get corresponding failed jobs](#failed-jobs)
+**Main features**
+
+ -  Relay doesn't create/modify DB tables
+ -  Clean looking complex batches
+ -  Ability to set middleware for multiple jobs
+ -  Search for specific batch via metadata
+ -  Monitor batch progress
+ -  Search for failed jobs
 
 ## Installation
 
@@ -19,28 +29,7 @@ composer require agatanga/relay
 
 ### Flatten nested callbacks
 
-Let's say you have the following job batches code:
-
-```php
-Bus::batch([
-    [
-        new DownloadSources($project),
-        new DetectSettings($project),
-    ],
-])->then(function (Batch $batch) use ($project) {
-    Bus::batch([
-        new ReadStringFiles($project),
-        new ReadSourceFiles($project),
-    ])->finally(function (Batch $batch) use ($project) {
-        Bus::batch([
-            new IgnoreKnownStrings($project),
-            new RemoveSources($project),
-        ])->name('Cleaning up')->dispatch();
-    })->name('Updating project data')->dispatch();
-})->name('Downloading')->dispatch();
-```
-
-Here is the same code written with Relay:
+Here is a flattened batches written with Relay:
 
 ```php
 use Agatanga\Relay\Facades\Relay;
@@ -53,10 +42,54 @@ Relay::chain('Downloading', [
         new ReadStringFiles($project),
         new ReadSourceFiles($project),
     ])
+    ->then('Updating project data', [
+        new FixFalseUnusedStrings($project),
+    ])
     ->finally('Cleaning up', [
         new IgnoreKnownStrings($project),
         new RemoveSources($project),
     ])
+    ->through(new Middleware($project))
+    ->dispatch();
+```
+
+<details>
+    <summary>View the same code written without Relay</summary>
+
+```php
+Bus::batch([
+    [
+        new DownloadSources($project)->through(new Middleware($project)),
+        new DetectSettings($project)->through(new Middleware($project)),
+    ],
+])->then(function (Batch $batch) use ($project) {
+    Bus::batch([
+        new ReadStringFiles($project)->through(new Middleware($project)),
+        new ReadSourceFiles($project)->through(new Middleware($project)),
+    ])->then(function (Batch $batch) use ($project) {
+        Bus::batch([
+            new FixFalseUnusedStrings($project)->through(new Middleware($project)),
+        ])->finally(function (Batch $batch) use ($project) {
+            Bus::batch([
+                new IgnoreKnownStrings($project)->through(new Middleware($project)),
+                new RemoveSources($project)->through(new Middleware($project)),
+            ])->name('Cleaning up')->dispatch();
+        })->name('Updating project data')->dispatch();
+    })->name('Updating project data')->dispatch();
+})->name('Downloading')->dispatch();
+```
+</details>
+
+### Middleware
+
+Relay allows you to set middleware for multiple jobs:
+
+```php
+Relay::chain([new Job1, new Job2])
+    ->batch([new Job3_1, new Job3_2])
+    ->chain([new Job4, new Job5], [new Middleware1])
+    ->chain([new Job6, new Job7])
+    ->through([new Middleware2]) // middleware for Job1-3, Job6-7
     ->dispatch();
 ```
 
